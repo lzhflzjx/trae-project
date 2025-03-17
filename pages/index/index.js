@@ -21,7 +21,34 @@ Page({
     });
   },
   generateName: function() {
-    // 调用Deepseek R1 API生成名字
-    // 这里将实现名字生成逻辑
+    if (!this.data.selectedGender || !this.data.selectedGeneration) {
+      wx.showToast({
+        title: '请先选择性别和代际',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showLoading({ title: '生成中...' });
+
+    const api = require('../../utils/api');
+    api.generateName({
+      gender: this.data.selectedGender,
+      generation: this.data.selectedGeneration
+    })
+    .then(res => {
+      this.setData({
+        generatedName: res.name,
+        nameExplanation: res.explanation
+      });
+      wx.hideLoading();
+    })
+    .catch(err => {
+      wx.hideLoading();
+      wx.showToast({
+        title: err.message || '生成失败',
+        icon: 'none'
+      });
+    });
   }
 })
